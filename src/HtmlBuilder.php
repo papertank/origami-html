@@ -18,6 +18,14 @@ class HtmlBuilder
     }
 
     /**
+     * @return Element
+     */
+    public function element($type, $text)
+    {
+        return $this->html->element($type)->html($text);
+    }
+
+    /**
      * Convert an HTML string to entities.
      *
      * @param  string  $value

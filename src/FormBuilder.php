@@ -5,9 +5,11 @@ namespace Origami\Html;
 use DateTime;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
+use Spatie\Html\Elements\Button;
 use Spatie\Html\Elements\Element;
 use Spatie\Html\Elements\Input;
 use Spatie\Html\Elements\Label;
+use Spatie\Html\Elements\Select;
 use Spatie\Html\Elements\Textarea;
 
 class FormBuilder
@@ -307,5 +309,196 @@ class FormBuilder
             name: $name,
             value: $value,
         )->attributes($options);
+    }
+
+    /**
+     * Create a select box field.
+     *
+     * @param  string  $name
+     * @param  array  $list
+     * @param  string|bool  $selected
+     * @return Select
+     */
+    public function select(
+        $name,
+        $list = [],
+        $selected = null,
+        array $attributes = [],
+    ) {
+        $html = $this->html->select(name: $name, value: $selected)->attributes(Arr::except($attributes, 'placeholder'));
+
+        if ($placeholder = Arr::get($attributes, 'placeholder')) {
+            $html->placeholder($placeholder);
+        }
+
+        $html->options($list);
+
+        return $html;
+    }
+
+    /**
+     * Create a select range field.
+     *
+     * @param  string  $name
+     * @param  string  $begin
+     * @param  string  $end
+     * @param  string  $selected
+     * @param  array  $options
+     * @return Select
+     */
+    public function selectRange($name, $begin, $end, $selected = null, $options = [])
+    {
+        $range = array_combine($range = range($begin, $end), $range);
+
+        return $this->select($name, $range, $selected, $options);
+    }
+
+    /**
+     * Create a select year field.
+     *
+     * @param  string  $name
+     * @param  string  $begin
+     * @param  string  $end
+     * @param  string  $selected
+     * @param  array  $options
+     * @return Select
+     */
+    public function selectYear()
+    {
+        return call_user_func_array([$this, 'selectRange'], func_get_args());
+    }
+
+    /**
+     * Create a select month field.
+     *
+     * @param  string  $name
+     * @param  string  $selected
+     * @param  array  $options
+     * @param  string  $format
+     * @return Select
+     */
+    public function selectMonth($name, $selected = null, $options = [], $format = '%B')
+    {
+        $months = [];
+
+        foreach (range(1, 12) as $month) {
+            $months[$month] = strftime($format, mktime(0, 0, 0, $month, 1));
+        }
+
+        return $this->select($name, $months, $selected, $options);
+    }
+
+    /**
+     * Create a checkbox input field.
+     *
+     * @param  string  $name
+     * @param  mixed  $value
+     * @param  bool  $checked
+     * @param  array  $options
+     * @return Input
+     */
+    public function checkbox($name, $value = 1, $checked = null, $options = [])
+    {
+        return $this->html->checkbox(
+            name: $name,
+            value: $value,
+            checked: $checked,
+        )->attributes($options);
+    }
+
+    /**
+     * Create a radio button input field.
+     *
+     * @param  string  $name
+     * @param  mixed  $value
+     * @param  bool  $checked
+     * @param  array  $options
+     * @return Input
+     */
+    public function radio($name, $value = null, $checked = null, $options = [])
+    {
+        if (is_null($value)) {
+            $value = $name;
+        }
+
+        return $this->html->radio(
+            name: $name,
+            value: $value,
+            checked: $checked,
+        )->attributes($options);
+    }
+
+    /**
+     * Create a HTML image input element.
+     *
+     * @param  string  $url
+     * @param  string  $name
+     * @param  array  $attributes
+     * @return Input
+     */
+    public function image($url, $name = null, $attributes = [])
+    {
+        $attributes['src'] = asset($url);
+
+        return $this->html->input('image', $name, null)->attributes($attributes);
+    }
+
+    /**
+     * Create a month input field.
+     *
+     * @param  string  $name
+     * @param  string  $value
+     * @param  array  $options
+     * @return Input
+     */
+    public function month($name, $value = null, $options = [])
+    {
+        if ($value instanceof DateTime) {
+            $value = $value->format('Y-m');
+        }
+
+        return $this->input('month', $name, $value, $options);
+    }
+
+    /**
+     * Create a color input field.
+     *
+     * @param  string  $name
+     * @param  string  $value
+     * @param  array  $options
+     * @return Input
+     */
+    public function color($name, $value = null, $options = [])
+    {
+        return $this->input('color', $name, $value, $options);
+    }
+
+    /**
+     * Create a submit button element.
+     *
+     * @param  string  $value
+     * @param  array  $options
+     * @return Input
+     */
+    public function submit($value = null, $options = [])
+    {
+        return $this->input('submit', null, $value, $options);
+    }
+
+    /**
+     * Create a button element.
+     *
+     * @param  string  $value
+     * @param  array  $options
+     * @return Button
+     */
+    public function button($value = null, $options = [])
+    {
+        $type = Arr::get($options, 'type', 'button');
+
+        return $this->html->button(
+            contents: $value,
+            type: $type
+        )->attributes(Arr::except($options, ['type']));
     }
 }

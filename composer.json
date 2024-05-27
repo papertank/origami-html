@@ -29,7 +29,11 @@
         "laravel": {
             "providers": [
                 "Origami\\Html\\HtmlServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "Html": "Origami\\Html\\Facades\\Html",
+                "Form": "Origami\\Html\\Facades\\Form"
+            }
         }
     },
     "minimum-stability": "dev",
