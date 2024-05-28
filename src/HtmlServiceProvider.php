@@ -34,6 +34,6 @@ class HtmlServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['origami-html', 'origami-html.html', 'origami-html.form'];
+        return ['origami-html', 'origami-html.html', 'origami-html.form', HtmlBuilder::class, FormBuilder::class, Html::class];
     }
 }

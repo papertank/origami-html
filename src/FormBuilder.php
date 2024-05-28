@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use Spatie\Html\Elements\Button;
 use Spatie\Html\Elements\Element;
+use Spatie\Html\Elements\Form;
 use Spatie\Html\Elements\Input;
 use Spatie\Html\Elements\Label;
 use Spatie\Html\Elements\Select;
@@ -23,7 +24,7 @@ class FormBuilder
         $this->html = $html;
     }
 
-    public function element(array $options = [])
+    public function element(array $options = []): Form
     {
         $attributes = Arr::except($options, ['method', 'url', 'route', 'action', 'files']);
         $html = $this->html->form(
@@ -40,14 +41,22 @@ class FormBuilder
         return $html;
     }
 
-    public function open(array $options = [])
+    public function open(array $options = []): string
     {
         return $this->element($options)->open();
     }
 
-    public function close(array $options = [])
+    public function close(array $options = []): string
     {
         return $this->element($options)->close();
+    }
+
+    /**
+     * Generate a hidden field with the current CSRF token.
+     */
+    public function token(): Input
+    {
+        return $this->html->token();
     }
 
     /**
@@ -351,41 +360,6 @@ class FormBuilder
         $range = array_combine($range = range($begin, $end), $range);
 
         return $this->select($name, $range, $selected, $options);
-    }
-
-    /**
-     * Create a select year field.
-     *
-     * @param  string  $name
-     * @param  string  $begin
-     * @param  string  $end
-     * @param  string  $selected
-     * @param  array  $options
-     * @return Select
-     */
-    public function selectYear()
-    {
-        return call_user_func_array([$this, 'selectRange'], func_get_args());
-    }
-
-    /**
-     * Create a select month field.
-     *
-     * @param  string  $name
-     * @param  string  $selected
-     * @param  array  $options
-     * @param  string  $format
-     * @return Select
-     */
-    public function selectMonth($name, $selected = null, $options = [], $format = '%B')
-    {
-        $months = [];
-
-        foreach (range(1, 12) as $month) {
-            $months[$month] = strftime($format, mktime(0, 0, 0, $month, 1));
-        }
-
-        return $this->select($name, $months, $selected, $options);
     }
 
     /**
